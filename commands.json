@@ -1,0 +1,19 @@
+{    
+    "add": {
+        "type": "function",
+        "reply": "add",
+        "desc": "syntax: ``kha!add <keyword>|<content>|<decription (optional)>``",
+        "modOnly": true
+    },
+    "remove": {
+        "type": "function",
+        "reply": "remove",
+        "desc": "syntax: ``kha!remove <command_to_remove>``",
+        "modOnly": true
+    },
+    "help": {
+        "type": "function",
+        "reply": "help",
+        "modOnly": false
+    }
+}
