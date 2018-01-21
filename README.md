@@ -15,11 +15,11 @@ Whenever someone starts streaming, bot assigns a Live Stream role to them. For i
 * ``kha!help`` - shows  the full list of commands that KhaBot has
 * ``kha!add <keyword>|<content>|<(optional)description>`` - adds your own commands - although only simple ones, where bot reacts with a text reply to a keyword
 * ``kha!remove <keyword>`` - removes custom command (can't remove default ones)
-* ``kha!streamrolename <stream_role_name>`` - changes the role supposed to showcase the live streamers (case sensitive)
+* ``kha!streamrolename <stream_role_name>`` - changes the role supposed to showcase the live streamers (case sensitive - if the role you put here doesn't exist bot will react with ⚠️)
 ## Reactions
 Bot uses reactions to let you know if he could execute the command:
 * ✅ - command succesfully executed
-* ⚠️ - something went wrong
+* ⚠️ - something went wrong (very broadly)
 * 🚫 - user doesn't have permissions to perform this command
 
 # Needed permissions
