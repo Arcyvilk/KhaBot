@@ -53,15 +53,17 @@ bot.on('ready', () => {
 bot.on('message', message => {
     var command = message.content;
 
-    if (command.startsWith(trigger)) {
-        var keyword = extractKeyword(command);
-        if (message.channel.id != message.author.id && commandExists(keyword)) {
-            command = settings.cmd[keyword];
-            if (settings.cmd[keyword].modOnly && !message.member.permissions.has('ADMINISTRATOR'))
-                return message.react('🚫');
-            var reply = appropriatelyToType(command, message);
-            if (reply)
-                message.channel.send(reply);
+    if (!message.author.bot && message.channel.type != 'dm') {
+        if (command.startsWith(trigger)) {
+            var keyword = extractKeyword(command);
+            if (message.channel.id != message.author.id && commandExists(keyword)) {
+                command = settings.cmd[keyword];
+                if (settings.cmd[keyword].modOnly && !message.member.permissions.has('ADMINISTRATOR'))
+                    return message.react('🚫');
+                var reply = appropriatelyToType(command, message);
+                if (reply)
+                    message.channel.send(reply);
+            }
         }
     }
 });
