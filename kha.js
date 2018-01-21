@@ -11,14 +11,41 @@ var settings = {
 bot.login(token);
 bot.on('ready', () => {
     bot.user.setPresence({ game: { name: `kha!help for help`, type: 0 } });
-    fs.readFile('settings.json', 'utf8', (err, data) => {
-        if (err)
-            return;
-        settings.data = JSON.parse(data);
-        fs.readFile('commands.json', 'utf8', (err, data) => {
-            if (err)
-                return;
-            settings.cmd = JSON.parse(data);
+
+    var defaultCommands = {
+        "add": {
+            "type": "function",
+            "reply": "add",
+            "desc": "syntax: ``kha!add <keyword>|<content>|<decription (optional)>``",
+            "modOnly": true
+        },
+        "remove": {
+            "type": "function",
+            "reply": "remove",
+            "desc": "syntax: ``kha!remove <command_to_remove>``",
+            "modOnly": true
+        },
+        "streamrolename": {
+            "type": "function",
+            "reply": "streamrolename",
+            "desc": "sets up the role name for live streams (case sensitive)",
+            "modOnly": true
+        },
+        "help": {
+            "type": "function",
+            "reply": "help",
+            "modOnly": false
+        }
+    }
+    var defaultSettings = {
+        "streamRoleName": "Live Stream",
+        "streamerRoleName": ""
+    }
+
+    loadFile('settings.json', defaultSettings, dataSettings => {
+        loadFile('commands.json', defaultCommands, dataCommands => {
+            settings.data = dataSettings;
+            settings.cmd = dataCommands;
             console.log(`Kha'Zix bot is ready to use!`);
         });
     });
@@ -60,6 +87,28 @@ bot.on('presenceUpdate', (oldMember, newMember) => {
     }
 });
 
+function loadFile(url, defaultContent, callback) {
+    fs.open(url, 'r', (err, fd) => {
+        if (err) {
+            fs.writeFile(url, JSON.stringify(defaultContent), err => {
+                if (err)
+                    throw err;
+                fs.readFile(url, 'utf8', (err, data) => {
+                    if (err)
+                        throw err;
+                    callback(JSON.parse(data));
+                });
+            });
+        }
+        else {
+            fs.readFile(url, 'utf8', (err, data) => {
+                if (err)
+                    throw err;
+                callback(JSON.parse(data));
+            });
+        }
+    });
+}
 function appropriatelyToType(command, message) {
     if (command.type == `text`)
         return command.reply;
