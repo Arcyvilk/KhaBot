@@ -71,16 +71,18 @@ bot.on('presenceUpdate', (oldMember, newMember) => {
 
     if (newMember.presence.game && newMember.presence.game.url) {
         streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName);
-        if (streamRoleID)
-            streamRoleID = streamRoleID.id;
+        if (!streamRoleID)
+            return;
+        streamRoleID = streamRoleID.id;
         newMember.addRole(streamRoleID)
             .then(success => { })
             .catch(error => console.log(`- add streaming role to ${newMember.user.username} - ${error}`));
     }
     if (!newMember.presence.game || !newMember.presence.game.url) {
         streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName);
-        if (streamRoleID)
-            streamRoleID = streamRoleID.id;
+        if (!streamRoleID)
+            return;
+        streamRoleID = streamRoleID.id;
         newMember.removeRole(streamRoleID)
             .then(success => { })
             .catch(error => console.log(`- rmv streaming role from ${newMember.user.username} - ${error}`));
