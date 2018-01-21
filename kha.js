@@ -10,6 +10,7 @@ var settings = {
 
 bot.login(token);
 bot.on('ready', () => {
+    bot.user.setPresence({ game: { name: `kha!help for help`, type: 0 } });
     fs.readFile('settings.json', 'utf8', (err, data) => {
         if (err)
             return;
@@ -88,6 +89,8 @@ var functions = {
                 listMod += ` - __${keyword}__`;
                 if (settings.cmd[keyword].desc)
                     listMod += ` - ${settings.cmd[keyword].desc}`;
+                if (keyword == 'streamrolename')
+                    listMod += `(currently **${settings.data.streamRoleName}**)`;
                 listMod += `\n`;
             }
             else {
@@ -140,7 +143,7 @@ var functions = {
         var roleExists = msg.guild.roles.find(role => role.name === roleName);
 
         if (!roleExists)
-            return msg.react('🚫');
+            return msg.react('⚠️');
         settings.data.streamRoleName = roleName;
         fs.writeFile("settings.json", JSON.stringify(settings.data), err => {
             if (err)
