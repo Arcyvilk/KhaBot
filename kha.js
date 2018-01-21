@@ -4,6 +4,7 @@ const token = process.env.TOKEN;
 const fs = require(`fs`);
 const trigger = `kha!`
 var settings = {
+    data: {},
     cmd: {}
 };
 
@@ -12,7 +13,7 @@ bot.on('ready', () => {
     fs.readFile('settings.json', 'utf8', (err, data) => {
         if (err)
             return;
-        settings = JSON.parse(data);
+        settings.data = JSON.parse(data);
         fs.readFile('commands.json', 'utf8', (err, data) => {
             if (err)
                 return;
@@ -30,13 +31,15 @@ bot.on('message', message => {
             command = settings.cmd[keyword];
             if (settings.cmd[keyword].modOnly && !message.member.permissions.has('ADMINISTRATOR'))
                 return message.react('🚫');
-            message.channel.send(appropriatelyToType(command, message));
+            var reply = appropriatelyToType(command, message);
+            if (reply)
+                message.channel.send(reply);
         }
     }
 });
 bot.on('presenceUpdate', (oldMember, newMember) => {
     var streamRoleID = '0';
-    var streamRoleName = settings.streamRoleName;
+    var streamRoleName = settings.data.streamRoleName;
 
     if (newMember.presence.game && newMember.presence.game.url) {
         streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName);
@@ -127,6 +130,19 @@ var functions = {
             return `:warning: Command **${m}** cannot be removed!`;
         delete settings.cmd[m];
         fs.writeFile("commands.json", JSON.stringify(settings.cmd), err => {
+            if (err)
+                return msg.react('⚠️');
+            return msg.react('✅');
+        });
+    },
+    streamrolename: function streamrolename(msg) {
+        var roleName = msg.content.substring(msg.content.indexOf(' ')).trim();
+        var roleExists = msg.guild.roles.find(role => role.name === roleName);
+
+        if (!roleExists)
+            return msg.react('🚫');
+        settings.data.streamRoleName = roleName;
+        fs.writeFile("settings.json", JSON.stringify(settings.data), err => {
             if (err)
                 return msg.react('⚠️');
             return msg.react('✅');

@@ -1,4 +1,4 @@
-{    
+{
     "add": {
         "type": "function",
         "reply": "add",
@@ -9,6 +9,12 @@
         "type": "function",
         "reply": "remove",
         "desc": "syntax: ``kha!remove <command_to_remove>``",
+        "modOnly": true
+    },
+    "streamrolename": {
+        "type": "function",
+        "reply": "streamrolename",
+        "desc": "sets up the role name for live streams (case sensitive)",
         "modOnly": true
     },
     "help": {
