@@ -3,15 +3,22 @@ const bot = new Discord.Client();
 const token = process.env.TOKEN;
 const fs = require(`fs`);
 const trigger = `kha!`
-var cmd = {};
+var settings = {
+    cmd: {}
+};
 
 bot.login(token);
 bot.on('ready', () => {
-    fs.readFile('commands.json', 'utf8', (err, data) => {
+    fs.readFile('settings.json', 'utf8', (err, data) => {
         if (err)
             return;
-        cmd = JSON.parse(data);
-        console.log(`Kha'Zix bot is ready to use!`);
+        settings = JSON.parse(data);
+        fs.readFile('commands.json', 'utf8', (err, data) => {
+            if (err)
+                return;
+            settings.cmd = JSON.parse(data);
+            console.log(`Kha'Zix bot is ready to use!`);
+        });
     });
 });
 bot.on('message', message => {
@@ -20,8 +27,8 @@ bot.on('message', message => {
     if (command.startsWith(trigger)) {
         var keyword = extractKeyword(command);
         if (message.channel.id != message.author.id && commandExists(keyword)) {
-            command = cmd[keyword];
-            if (cmd[keyword].modOnly && !message.member.permissions.has('ADMINISTRATOR'))
+            command = settings.cmd[keyword];
+            if (settings.cmd[keyword].modOnly && !message.member.permissions.has('ADMINISTRATOR'))
                 return message.react('🚫');
             message.channel.send(appropriatelyToType(command, message));
         }
@@ -29,19 +36,23 @@ bot.on('message', message => {
 });
 bot.on('presenceUpdate', (oldMember, newMember) => {
     var streamRoleID = '0';
-    var streamRoleName = 'Test';
+    var streamRoleName = settings.streamRoleName;
 
-    if (newMember.presence.status == 'dnd' && oldMember.presence.status != 'dnd') { //placeholder for streaming status
-        streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName).id;
+    if (newMember.presence.game && newMember.presence.game.url) {
+        streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName);
+        if (streamRoleID)
+            streamRoleID = streamRoleID.id;
         newMember.addRole(streamRoleID)
-            .then(a => console.log(`:) add ${a}`))
-            .catch(e => console.log(`:( add ${e}`));
+            .then(success => { })
+            .catch(error => console.log(`- add streaming role to ${newMember.user.username} - ${error}`));
     }
-    if (newMember.presence.status != 'dnd' && oldMember.presence.status == 'dnd') { //placeholder for streaming status
-        streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName).id;
+    if (!newMember.presence.game || !newMember.presence.game.url) {
+        streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName);
+        if (streamRoleID)
+            streamRoleID = streamRoleID.id;
         newMember.removeRole(streamRoleID)
-            .then(a => console.log(`:) rmv ${a}`))
-            .catch(e => console.log(`:( rmv ${e}`));
+            .then(success => { })
+            .catch(error => console.log(`- rmv streaming role from ${newMember.user.username} - ${error}`));
     }
 });
 
@@ -57,7 +68,7 @@ function extractKeyword(command) {
     return k[0].trim();
 };
 function commandExists(keyword) {
-    return (cmd.hasOwnProperty(keyword));
+    return (settings.cmd.hasOwnProperty(keyword));
 };
 
 ///---------------------------------------------------------------------------------------------------
@@ -69,17 +80,17 @@ var functions = {
         var listNormal = `**Standard commands**\n`;
         var listMod = `**Moderation commands**\n`;
 
-        for (keyword in cmd) {
-            if (cmd[keyword].modOnly) {
+        for (keyword in settings.cmd) {
+            if (settings.cmd[keyword].modOnly) {
                 listMod += ` - __${keyword}__`;
-                if (cmd[keyword].desc)
-                    listMod += ` - ${cmd[keyword].desc}`;
+                if (settings.cmd[keyword].desc)
+                    listMod += ` - ${settings.cmd[keyword].desc}`;
                 listMod += `\n`;
             }
             else {
                 listNormal += ` - __${keyword}__`;
-                if (cmd[keyword].desc)
-                    listNormal += ` - ${cmd[keyword].desc}`;
+                if (settings.cmd[keyword].desc)
+                    listNormal += ` - ${settings.cmd[keyword].desc}`;
                 listNormal += `\n`;
             }
         }
@@ -93,15 +104,15 @@ var functions = {
         m = m.split('|');
         if (m[0] == "" || m[1] == "")
             return `:warning: Invalid keyword or content.`;
-        if (cmd.hasOwnProperty(m[0].trim()))
+        if (settings.cmd.hasOwnProperty(m[0].trim()))
             return `:warning: Command **${m[0].trim()}** already exists.`;
-        cmd[m[0].trim()] = {
+        settings.cmd[m[0].trim()] = {
             "type": "text",
             "reply": m[1].trim(),
             "desc": m[2],
             "modOnly": false
         };
-        fs.writeFile("commands.json", JSON.stringify(cmd), err => {
+        fs.writeFile("commands.json", JSON.stringify(settings.cmd), err => {
             if (err)
                 return msg.react('⚠️');
             return msg.react('✅');
@@ -110,12 +121,12 @@ var functions = {
     remove: function remove(msg) {
         var m = msg.content.substring(msg.content.indexOf(' ')).trim();
 
-        if (!cmd.hasOwnProperty(m))
+        if (!settings.cmd.hasOwnProperty(m))
             return `:warning: Command **${m}** doesn't exist.`;
-        if (cmd[m].type == 'function')
+        if (settings.cmd[m].type == 'function')
             return `:warning: Command **${m}** cannot be removed!`;
-        delete cmd[m];
-        fs.writeFile("commands.json", JSON.stringify(cmd), err => {
+        delete settings.cmd[m];
+        fs.writeFile("commands.json", JSON.stringify(settings.cmd), err => {
             if (err)
                 return msg.react('⚠️');
             return msg.react('✅');
