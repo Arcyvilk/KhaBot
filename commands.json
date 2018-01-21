@@ -20,6 +20,6 @@
     "help": {
         "type": "function",
         "reply": "help",
-        "modOnly": false
+        "modOnly": false 
     }
 }
