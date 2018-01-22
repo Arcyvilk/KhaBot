@@ -186,7 +186,7 @@ var functions = {
         };
         fs.writeFile("commands.json", JSON.stringify(settings.cmd), err => {
             if (err)
-                return msg.react('⚠️');
+                return msg.react('⚠');
             return msg.react('✅');
         });
     },
@@ -200,7 +200,7 @@ var functions = {
         delete settings.cmd[m];
         fs.writeFile("commands.json", JSON.stringify(settings.cmd), err => {
             if (err)
-                return msg.react('⚠️');
+                return msg.react('⚠');
             return msg.react('✅');
         });
     },
@@ -209,11 +209,11 @@ var functions = {
         var roleExists = msg.guild.roles.find(role => role.name === roleName);
 
         if (!roleExists)
-            return msg.react('⚠️');
+            return msg.react('⚠');
         settings.data.streamRoleName = roleName;
         fs.writeFile("settings.json", JSON.stringify(settings.data), err => {
             if (err)
-                return msg.react('⚠️');
+                return msg.react('⚠');
             return msg.react('✅');
         });
     },
@@ -222,11 +222,11 @@ var functions = {
         var roleExists = msg.guild.roles.find(role => role.name === roleName);
 
         if (!roleExists)
-            return msg.react('⚠️');
+            return msg.react('⚠');
         settings.data.streamerRoleName = roleName;
         fs.writeFile("settings.json", JSON.stringify(settings.data), err => {
             if (err)
-                return msg.react('⚠️');
+                return msg.react('⚠');
             return msg.react('✅');
         });
     }
