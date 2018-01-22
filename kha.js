@@ -28,7 +28,13 @@ bot.on('ready', () => {
         "streamrolename": {
             "type": "function",
             "reply": "streamrolename",
-            "desc": "sets up the role name for live streams (case sensitive)",
+            "desc": "sets up the role name for live streams (case sensitive) ",
+            "modOnly": true
+        },
+        "streamerrolename": {
+            "type": "function",
+            "reply": "streamerrolename",
+            "desc": "sets up the role name for streamers (case sensitive) ",
             "modOnly": true
         },
         "help": {
@@ -39,7 +45,7 @@ bot.on('ready', () => {
     }
     var defaultSettings = {
         "streamRoleName": "Live Stream",
-        "streamerRoleName": ""
+        "streamerRoleName": "Streamer"
     }
 
     loadFile('settings.json', defaultSettings, dataSettings => {
@@ -70,8 +76,13 @@ bot.on('message', message => {
 bot.on('presenceUpdate', (oldMember, newMember) => {
     var streamRoleID = '0';
     var streamRoleName = settings.data.streamRoleName;
+    var hasStreamerRole = false;
+    var streamerRoleName = settings.data.streamerRoleName;
 
     if (newMember.presence.game && newMember.presence.game.url) {
+        hasStreamerRole = newMember.roles.find(role => role.name === streamerRoleName);
+        if (!hasStreamerRole)
+            return;
         streamRoleID = newMember.guild.roles.find(role => role.name === streamRoleName);
         if (!streamRoleID)
             return;
@@ -144,6 +155,8 @@ var functions = {
                     listMod += ` - ${settings.cmd[keyword].desc}`;
                 if (keyword == 'streamrolename')
                     listMod += `(currently **${settings.data.streamRoleName}**)`;
+                if (keyword == 'streamerrolename')
+                    listMod += `(currently **${settings.data.streamerRoleName}**)`;
                 listMod += `\n`;
             }
             else {
@@ -198,6 +211,19 @@ var functions = {
         if (!roleExists)
             return msg.react('⚠️');
         settings.data.streamRoleName = roleName;
+        fs.writeFile("settings.json", JSON.stringify(settings.data), err => {
+            if (err)
+                return msg.react('⚠️');
+            return msg.react('✅');
+        });
+    },
+    streamerrolename: function streamerrolename(msg) {
+        var roleName = msg.content.substring(msg.content.indexOf(' ')).trim();
+        var roleExists = msg.guild.roles.find(role => role.name === roleName);
+
+        if (!roleExists)
+            return msg.react('⚠️');
+        settings.data.streamerRoleName = roleName;
         fs.writeFile("settings.json", JSON.stringify(settings.data), err => {
             if (err)
                 return msg.react('⚠️');
