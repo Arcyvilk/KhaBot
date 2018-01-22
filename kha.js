@@ -16,13 +16,13 @@ bot.on('ready', () => {
         "add": {
             "type": "function",
             "reply": "add",
-            "desc": "syntax: ``kha!add <keyword>|<content>|<decription (optional)>``",
+            "desc": "adds a command. Syntax: ``kha!add <keyword>|<content>|<decription (optional)>``",
             "modOnly": true
         },
         "remove": {
             "type": "function",
             "reply": "remove",
-            "desc": "syntax: ``kha!remove <command_to_remove>``",
+            "desc": "removes a command. Syntax: ``kha!remove <command_to_remove>``",
             "modOnly": true
         },
         "streamrolename": {
