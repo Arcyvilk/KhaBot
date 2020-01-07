@@ -1,6 +1,7 @@
 ﻿const Discord = require('discord.js');
 const bot = new Discord.Client();
-const token = process.env.TOKEN;
+const config = require('./config.json');
+const token = config.DISCORD_TOKEN;
 const fs = require(`fs`);
 const trigger = `kha!`
 var settings = {
